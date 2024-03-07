@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -18,6 +19,7 @@ class _homeState extends State<home> {
     'Urine Complete Analysis', // Corrected spelling
   ];
   String? selected;
+  String? selectedTest;
 
   String selectedValue = '';
   Map<String, String> sampleTypes = {};
@@ -197,46 +199,92 @@ class _homeState extends State<home> {
                   ),
                 ),
                 SizedBox(
-                  width: 190,
+                  width: 185,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(3.0),
-                  child:
-                      Text("Sample Type", style: TextStyle(color: Colors.grey)),
+                  child: Text("Amount", style: TextStyle(color: Colors.grey)),
                 )
               ],
             ),
           ),
-          Table(
-            columnWidths: {
-              0: FlexColumnWidth(2.2),
-              1: FlexColumnWidth(.7),
-            },
-            border: TableBorder.all(color: Color.fromARGB(255, 225, 227, 228)),
-            children: [
-              for (int i = 0; i < tests.length; i++)
-                TableRow(
-                  children: [
-                    TableCell(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(tests[i]),
+          Container(
+            height: 100, // Set the height as per your requirement
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Visibility(
+                    visible: sampleTypes.isNotEmpty,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: sampleTypes.length,
+                      itemBuilder: (context, index) {
+                        var entry = sampleTypes.entries.elementAt(index);
+                        return Table(
+                          columnWidths: {
+                            0: FlexColumnWidth(2.0),
+                            1: FlexColumnWidth(.5),
+                            2: FlexColumnWidth(.3),
+                          },
+                          border: TableBorder.all(
+                            color: Color.fromARGB(255, 225, 227, 228),
                           ),
-                        ),
-                      ),
+                          children: [
+                            TableRow(
+                              children: [
+                                TableCell(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 10, 0, 0),
+                                        child: Text(entry.key),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 10, 0, 0),
+                                      child: Text(entry.value),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Center(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _openDialog(
+                                            context, tests.indexOf(entry.key));
+                                      },
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                    TableCell(
-                      child: Center(
-                        child: Text(sampleTypes[tests[i]] ?? ''),
-                      ),
-                    ),
-                  ],
-                ),
-            ],
+                  ),
+                ],
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(80, 10, 80, 10),
@@ -285,6 +333,8 @@ class _homeState extends State<home> {
                   // Add the selected test and its sample type to the map
                   sampleTypes[suggestion] = getSampleTypeForTest(suggestion);
                   setSampleTypeForSelectedTest(selectedValue);
+                  isTypeAheadVisible = false;
+                  selectedValue = '';
                 });
               },
               noItemsFoundBuilder: (context) {
@@ -297,7 +347,7 @@ class _homeState extends State<home> {
             color: Color.fromARGB(255, 216, 214, 214),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
             child: Row(
               children: [
                 Icon(
@@ -417,7 +467,7 @@ class _homeState extends State<home> {
             child: Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                  padding: const EdgeInsets.fromLTRB(0, 8, 8, 0),
                   child: OutlinedButton(
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(
@@ -429,7 +479,7 @@ class _homeState extends State<home> {
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
                         child: Text(
                           "Cancel Visit",
                           style: TextStyle(color: Colors.green),
@@ -442,13 +492,13 @@ class _homeState extends State<home> {
                   width: 10,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
                   child: ElevatedButton(
                     onPressed: () {},
                     child: Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
+                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                         child: Text(
                           "Collect Sample",
                           style: TextStyle(color: Colors.white),
@@ -482,15 +532,49 @@ class _homeState extends State<home> {
   String getSampleTypeForTest(String test) {
     // Define a map to store sample types for each test
     Map<String, String> sampleTypeMap = {
-      'Lipid Profile': 'Blood',
-      'Thyroid Stimulating Hormone (TSH)': 'Blood',
-      'Fasting Blood Suger (FBS)': 'Blood',
-      'Vitamin D': 'Blood',
-      'Urine Complete Analysis': 'Urine',
+      'Lipid Profile': '250 /-',
+      'Thyroid Stimulating Hormone (TSH)': '600 /-',
+      'Fasting Blood Suger (FBS)': '450 /-',
+      'Vitamin D': '300 /-',
+      'Urine Complete Analysis': '200 /-',
     };
 
     // Return the sample type for the given test
     return sampleTypeMap[test] ?? '';
+  }
+
+  Future _openDialog(BuildContext _context, int index) {
+    return showDialog(
+      context: _context,
+      builder: (_) => CupertinoAlertDialog(
+        title: Column(
+          children: [
+            Text("Do you want to remove this test?"),
+            SizedBox(
+              height: 15.0,
+            ),
+          ],
+        ),
+        actions: [
+          Row(
+            children: [
+              TextButton(
+                onPressed: () {
+                  onDeleteRow(index);
+                },
+                child: Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(_context).pop();
+                },
+                child: Text('Close'),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   void setSampleTypeForSelectedTest(String selectedTest) {
@@ -504,5 +588,28 @@ class _homeState extends State<home> {
       // Update the amount text field
       amountController.text = totalAmount.toStringAsFixed(2);
     });
+  }
+
+  void onDeleteRow(int test) {
+    String testKey = tests[test];
+
+    // Get the corresponding sample type and subtract its amount from total
+    String sampleType = sampleTypes[testKey] ?? '';
+    double amount = getAmountForSampleType(sampleType);
+    totalAmount -= amount;
+    dueAmount -= amount;
+
+    // Remove the sample type from the map
+    sampleTypes.remove(testKey);
+
+    // Update the UI
+    setState(() {
+      Navigator.of(context).pop();
+    });
+  }
+
+  double getAmountForSampleType(String sampleType) {
+    // Use this function to get the amount based on the sample type
+    return double.parse(sampleType.split(" /-")[0]);
   }
 }
