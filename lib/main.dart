@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:sample_design/home.dart';
+import 'package:HealthCare/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
